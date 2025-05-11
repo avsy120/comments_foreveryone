@@ -1,177 +1,184 @@
 <!DOCTYPE html>
-<html lang="he" class="scroll-smooth">
+<html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>תגובות שירות לקוחות</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <title>מחשבון גימטריה</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to bottom, #f0f0f0, #ffffff);
+      text-align: center;
+      padding: 2rem;
+      color: #222;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+    h2 {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+      color: #34495e;
+    }
+    textarea, input[type="number"] {
+      width: 100%;
+      max-width: 400px;
+      height: 100px;
+      font-size: 1.2rem;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      direction: rtl;
+      resize: vertical;
+    }
+    input[type="number"] {
+      height: auto;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+      background-color: #2980b9;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #3498db;
+    }
+    #result, #reverseResult {
+      margin-top: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease-in-out;
+    }
+    .show {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+    @media (max-width: 480px) {
+      body {
+        padding: 1rem;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      h2 {
+        font-size: 1.25rem;
+      }
+      textarea, input[type="number"] {
+        font-size: 1rem;
+        padding: 0.5rem;
+      }
+      button {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body>
+  <h1>מחשבון גימטריה</h1>
 
-  <!-- Header -->
-  <header class="bg-white shadow">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-semibold">תגובות שירות לקוחות</h1>
-      <div class="flex space-x-2">
-        <button onclick="openModal('addModal')" class="flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow">
-          <i class="fa fa-plus ml-2"></i> הוסף תגובה
-        </button>
-        <button onclick="openModal('deletedModal')" class="flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow">
-          <i class="fa fa-trash-alt"></i>
-        </button>
-      </div>
-    </div>
-  </header>
+  <h2>טקסט לעברית למספר</h2>
+  <textarea id="hebrewText" placeholder="הכנס טקסט בעברית..."></textarea>
+  <br>
+  <button onclick="calculateGematria()">חשב ערך גימטרי</button>
+  <div id="result"></div>
 
-  <!-- Main & Search -->
-  <main class="max-w-5xl mx-auto px-4 py-6">
-    <input id="searchInput" oninput="filterResponses()" type="text" placeholder="🔍 חפש תגובה..." 
-      class="w-full p-3 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
-    <div id="responsesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Response cards -->
-    </div>
-  </main>
-
-  <!-- Add Response Modal -->
-  <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
-      <button onclick="closeModal('addModal')" class="absolute top-4 left-4 text-gray-500 hover:text-gray-800">
-        ×
-      </button>
-      <h2 class="text-xl font-semibold mb-4">הוסף תגובה חדשה</h2>
-      <textarea id="newResponseText" rows="4" 
-        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" 
-        placeholder="תוכן התגובה"></textarea>
-      <div class="mt-4 text-right">
-        <button onclick="addResponse()" 
-          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow">
-          <i class="fa fa-check ml-2"></i>הוסף
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Deleted Responses Modal -->
-  <div id="deletedModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
-      <button onclick="closeModal('deletedModal')" class="absolute top-4 left-4 text-gray-500 hover:text-gray-800">
-        ×
-      </button>
-      <h2 class="text-xl font-semibold mb-4">תגובות שנמחקו</h2>
-      <div id="deletedContainer" class="space-y-4 max-h-80 overflow-y-auto">
-        <!-- Deleted responses -->
-      </div>
-    </div>
-  </div>
+  <h2>(מספר לאותיות (גימטריה באותיות</h2>
+  <input type="number" id="numberInput" placeholder="הכנס מספר..." />
+  <br>
+  <button onclick="numberToGematria()">המר למילים</button>
+  <div id="reverseResult"></div>
 
   <script>
-    const initial = [
-      `המערכת מזהה באופן אוטומטי חיובים כפולים או שגויים ופועלת לביטולם. עם זאת, עדכון הנתונים עשוי להימשך מספר ימים.
-במידה והחיובים ממשיכים להופיע בפירוט העסקאות, ניתן לפנות אלינו ואנו נדאג לזיכוי בהתאם 🙏`,
-      `שלום,
-לאחר בדיקה, לא נמצא חיוב כפול. ייתכן שיידרש פרק זמן קצר עד שהחיוב יוסר באופן סופי. בשלב זה הוא חסום במערכות שלנו.
-מומלץ לעקוב אחר פירוט העסקאות, ובמידה והחיוב לא ייעלם – ניתן לפנות אלינו בשנית, ונשמח לסייע.
-תודה רבה 🙏`,
-      `אשמח לקבל את 4 הספרות האחרונות של אמצעי התשלום ששימש לביצוע ההזמנה, על מנת שנוכל לאתר אותה במערכת.
-לתשומת לבך – במידה והתשלום בוצע באמצעות ארנק דיגיטלי כגון Google Pay או Apple Pay, ייתכן שהספרות האחרונות שונות מאלה שעל כרטיס האשראי.
-תודה רבה 🙏`,
-      `במידה והתשלום בוצע באמצעות Apple Pay, ניתן למצוא את מספר הכרטיס הווירטואלי כך:
-יש להיכנס לארנק הדיגיטלי (Wallet), ללחוץ על שלוש הנקודות בצד העליון של המסך, לבחור ב"מספר כרטיס" – ושם יוצג מספר הכרטיס המשויך לארנק הדיגיטלי.`,
-      `במידה והתשלום בוצע ב Google Pay: ועל מנת למצוא את 4 הספרות האחרונות של אמצעי התשלום
-פתח את אפליקציית Google Pay
-בחר בכרטיס שברצונך לבדוק.
-לחץ על הסמל של שלוש הנקודות בצד העליון של המסך.
-בחר ב"פרטי כרטיס" או "הצגת מספר כרטיס".
-שם תוכל לראות את 4 הספרות האחרונות של כרטיסך.`,
-      `היי, בינואר שינינו את מבנה מועדון הלקוחות, וכעת ישנן דרגות חברות שונות. דרגת החברות הנוכחית שלך היא דרגת "פרש" (Fresh) שבה לא מתבצעת צבירת נקודות. לאחר שתגיעי ל-10 הזמנות בשנה (כרגע יש לך ), תעברי לדרגת חברות גבוהה יותר, בה תוכלי לצבור נקודות באופן קבוע❤️`,
-      `היי , בינואר שינינו את מבנה מועדון הלקוחות, וכעת ישנן דרגות חברות שונות. דרגת החברות הנוכחית שלך היא דרגת "פרש" (Fresh), שבה לא מתבצרת צבירת נקודות. לאחר שתגיע ל-10 הזמנות בשנה (כרגע יש לך ), תעבור לדרגת חברות גבוהה יותר, בה תוכל לצבור נקודות באופן קבוע❤️`,
-      `היי מתנצלים על אי הנוחות לצערי אין לנו אפשרות לבדוק קופון שלא אנחנו נפקנו לכן יש לפנות לחברה ממנה רכשת את הקופון על מנת לברר את תקינותו 🙏`,
-      `שלום,
-אין אפשרות ביטול שמזמינים באפליקציה כי ההזמנה עוברת ישירות לסניף להכנת המשקה– ומתחיל תהליך ההכנה באופן מיידי.
-במידה ולא מתבצע איסוף, המשקה נזרק בהתאם לנהלי הרשת.
-יחד עם זאת, ניתן לגשת לסניף בו בוצעה ההזמנה (או לסניף הקרוב ביותר אליך) בזמן אמת, להציג את אישור ההזמנה – והמשקה יוכן עבורך מחדש, ללא תשלום נוסף 😊`,
-      `אני מסכימה לחלוטין עם הדברים שהעלית.
-המשוב שלך יועבר באופן מיידי לזכיין הסניף לצורך בחינה ושיפור השירות.
-אנו מקפידים על רמת שירות גבוהה ואיכותי, וכל משוב נלקח ברצינות רבה. תודה על פנייתך, והמשוב שלך מועבר כעת לצוות המטפל 🙏`,
-      `אני מסכימה לחלוטין עם הדברים שהעלית.
-המשוב שלך יועבר באופן מיידי לזכיין הסניף לצורך בחינה ושיפור השירות. אנו שמים דגש גדול על איכות השירות של העובדים שלנו ואני מייד מעבירה את המשוב שלך 🙏`,
-      `חשוב להדגיש כי במערך העבודה שלנו, על אף שאנחנו מקפידים על הפרדת רכיבים, כל המשקאות מוכנים על אותו פס, ולכן עלולים להיות שאריות של אלרגנים שונים, לרבות חלב ומוצריו. לצערנו, לא ניתן להבטיח סטריליות מוחלטת מאלרגנים בסניפים שלנו. כפי שמצוין בתפריט שלנו ובאפליקציה, אנו ממליצים ללקוחות עם רגישויות או אלרגיות לבדוק מראש את רשימת המרכיבים וליידע את הצוות בסניף כדי שנוכל לסייע בצורה מיטבית 🙏`,
-      `נשמח אם תבחר לקבל את המחווה שהוצעה, מתוך כוונה לשמור על שביעות רצונך כלקוח. יחד עם זאת, נבקש להדגיש כי איננו יכולים להציע פיצוי נוסף מעבר לכך.
-אנו מקווים שתמשיך ליהנות מהמוצרים והשירות שלנו בעתיד 🙏`,
-      `כמחווה שירותית, אוכל להציע לך 50% הנחה על המשקה הבא. להבא, בכל הנוגע למשקאות יש לפנות ישירות לסניף
-תודה על ההבנה 🙏`,
-      `זו המחווה השירותית שנוכל להציע. במידה והמשקה לא לטעמך, ניתן לפנות לברמן ולבקש תיקון – הם יבצעו זאת בשמחה, אלו נהילי הרשת.
-תודה על ההבנה 🙏`,
-      `המשקה שהוכן נזרק, ולכן אין ביכולתנו להציע החזר כספי, מאחר ובוצע נפיצום ברכיבים. יחד עם זאת, כמחווה שירותית, אוכל להוסיף לך הטבה של משקה ללא עלות למועדון שלך.
-ואנו מקווים שהחוויה הבאה תהיה טובה יותר ❤️`,
-      `מתנצלים על אי הנוחות אך יש לוודא את תקינות המשקה לפני לקיחתו ובמידה ויש משהו שאינו לשביעות רצונך יש להודיע לברמן וישמחו לסייע לך`,
-      `אנו מצטערים על החוויה שלך. אשמח אם תוכל לשלוח תמונה של המשקה, על מנת שאוכל להעביר את המקרה לבירור מול הסניף.
-תודה רבה 🙏`,
-      `אנו לא נמצאים בסניפים, ולכן במידה וקיבלת משקה שלא היה לשביעות רצונך מסיבה כלשהי, ישנה אפשרות להחליף או לתקן אותו במקום. לצערנו, אין לנו אפשרות להתחקות אחר המשקה שקיבלת.
-תודה על ההבנה 🙏`,
-      `במידה ורכשת בסניף, חשוב לוודא שהמשקה לשביעות רצונך. לצערנו, אין לנו אפשרות להתחקות אחר מה שקיבלת, ולכן זה באחריות הסניף בלבד. אנו תמיד ממליצים, גם אם מדובר באיסוף לדרך, לבדוק שהכל בסדר ולטעמך 🙏`
-    ];
-    let deleted = [];
-    function init() {
-      const cont = document.getElementById('responsesContainer');
-      initial.forEach((txt,i)=>cont.appendChild(card(txt,i)));
+    const gematriaMap = {
+      'א': 1, 'ב': 2, 'ג': 3, 'ד': 4, 'ה': 5,
+      'ו': 6, 'ז': 7, 'ח': 8, 'ט': 9,
+      'י': 10, 'כ': 20, 'ך': 20, 'ל': 30,
+      'מ': 40, 'ם': 40, 'נ': 50, 'ן': 50,
+      'ס': 60, 'ע': 70, 'פ': 80, 'ף': 80,
+      'צ': 90, 'ץ': 90, 'ק': 100, 'ר': 200,
+      'ש': 300, 'ת': 400
+    };
+
+    const exceptions = {
+      'טו': 15,
+      'טז': 16,
+      'יז': 17
+    };
+
+    function calculateGematria() {
+      const text = document.getElementById('hebrewText').value;
+      let value = 0;
+      let normalized = text.replace(/[^א-ת"׳\s]/g, '').replace(/["׳]/g, '');
+
+      for (const [key, val] of Object.entries(exceptions)) {
+        while (normalized.includes(key)) {
+          normalized = normalized.replace(key, '');
+          value += val;
+        }
+      }
+
+      for (let char of normalized) {
+        if (gematriaMap[char]) {
+          value += gematriaMap[char];
+        }
+      }
+
+      const resEl = document.getElementById('result');
+      resEl.innerText = `הערך הגימטרי: ${value}`;
+      resEl.classList.add('show');
     }
-    function card(txt,id){
-      const d=document.createElement('div');
-      d.className='response bg-white p-5 rounded-lg shadow';
-      d.id='card-'+id;
-      d.innerHTML=`<p class="mb-4 whitespace-pre-wrap">${txt}</p>
-<div class="flex justify-end space-x-2">
-<button class="copy bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded" onclick="copyText(${id},this)">העתק</button>
-<button class="delete bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded" onclick="deleteCard(${id})">מחק</button>
-</div>`;
-      return d;
+
+    function numberToGematria() {
+      let num = parseInt(document.getElementById('numberInput').value);
+      const resEl = document.getElementById('reverseResult');
+
+      if (isNaN(num) || num <= 0) {
+        resEl.innerText = 'נא להזין מספר חוקי';
+        resEl.classList.add('show');
+        return;
+      }
+
+      const letters = [
+        ['ת', 400], ['ש', 300], ['ר', 200], ['ק', 100],
+        ['צ', 90], ['פ', 80], ['ע', 70], ['ס', 60], ['נ', 50], ['מ', 40], ['ל', 30],
+        ['כ', 20], ['י', 10], ['ט', 9], ['ח', 8], ['ז', 7], ['ו', 6], ['ה', 5], ['ד', 4], ['ג', 3], ['ב', 2], ['א', 1]
+      ];
+
+      let result = '';
+      if (num === 15) {
+        resEl.innerText = 'טו';
+        resEl.classList.add('show');
+        return;
+      }
+      if (num === 16) {
+        resEl.innerText = 'טז';
+        resEl.classList.add('show');
+        return;
+      }
+
+      for (let [letter, val] of letters) {
+        while (num >= val) {
+          result += letter;
+          num -= val;
+        }
+      }
+
+      resEl.innerText = `האותיות: ${result}`;
+      resEl.classList.add('show');
     }
-    function filterResponses(){
-      const q=document.getElementById('searchInput').value.toLowerCase();
-      document.querySelectorAll('#responsesContainer .response').forEach(c=>{
-        c.style.display=c.innerText.toLowerCase().includes(q)?'block':'none';});
-    }
-    function copyText(id,btn){
-      const t=document.querySelector('#card-'+id+' p').innerText;
-      navigator.clipboard.writeText(t).then(()=>{
-        btn.textContent='הועתק';btn.classList.add('opacity-50');
-        setTimeout(()=>{btn.textContent='העתק';btn.classList.remove('opacity-50')},800);
-      });
-    }
-    function deleteCard(id){
-      const code=prompt('להמשך המחיקה, הכנס קוד:');
-      if(code==='5555'){const c=document.getElementById('card-'+id);
-        deleted.push(c.cloneNode(true));c.remove();
-      } else alert('קוד שגוי.');
-    }
-    function openModal(i){document.getElementById(i).classList.remove('hidden');}
-    function closeModal(i){document.getElementById(i).classList.add('hidden');}
-    function renderDeleted(){
-      const dc=document.getElementById('deletedContainer');dc.innerHTML='';
-      deleted.forEach((d,idx)=>{const w=document.createElement('div');
-        w.className='deleted-response bg-gray-50 p-4 rounded-lg';
-        const txt=d.querySelector('p').innerText;
-        w.innerHTML=`<p class="whitespace-pre-wrap">${txt}</p>
-<div class="mt-2"><button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded" onclick="restore(${idx})">החזר תגובה זו</button></div>`;dc.appendChild(w);
-      });
-    }
-    function deleteDialog(){openModal('deletedModal');renderDeleted();}
-    function restore(i){const c=deleted.splice(i,1)[0];
-      document.getElementById('responsesContainer').appendChild(c);renderDeleted();}
-    function addResponse(){
-      const txt=document.getElementById('newResponseText').value.trim();
-      if(!txt)return alert('אנא מלא תוכן.');
-      const cont=document.getElementById('responsesContainer'),
-            id=cont.children.length;
-      cont.prepend(card(txt,id));
-      closeModal('addModal');
-      document.getElementById('newResponseText').value='';
-    }
-    window.onload=init;
   </script>
 </body>
 </html>
